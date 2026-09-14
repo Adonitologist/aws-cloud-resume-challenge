@@ -26,7 +26,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt boto3
-          python -m unittest backend/test_lambda.py
+          PYTHONPATH=backend python -m unittest backend/test_lambda.py
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -64,10 +64,10 @@ jobs:
 
       - name: Deploy Frontend to S3 & Invalidate Cache
         run: |
-          S3_BUCKET=$(terraform output -raw s3_bucket_name 2>/dev/null || echo "juaneslava-cloud-resume-2026")
+          S3_BUCKET="juaneslava-cloud-resume-2026"
           DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='$S3_BUCKET.s3.us-east-1.amazonaws.com'].Id" --output text)
           
           aws s3 sync ./frontend s3://$S3_BUCKET --delete
-          if [ -n "$DISTRIBUTION_ID" ]; then
+          if [ -n "$DISTRIBUTION_ID" ] && [ "$DISTRIBUTION_ID" != "None" ]; then
             aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
           fi
