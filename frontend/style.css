@@ -19,7 +19,7 @@ body {
 }
 
 header {
-    border-bottom: 2px solid #232f3e; /* AWS Squid Ink dark blue */
+    border-bottom: 2px solid #232f3e;
     padding-bottom: 20px;
     margin-bottom: 20px;
 }
@@ -32,9 +32,39 @@ header h1 {
 
 header p {
     margin: 5px 0 0 0;
-    color: #ff9900; /* AWS Orange tint */
+    color: #ff9900;
     font-weight: bold;
     font-size: 1.2rem;
+}
+
+.contact-bar {
+    margin-top: 10px;
+    font-size: 0.95rem;
+    color: #555;
+}
+
+.header-actions {
+    margin-top: 15px;
+}
+
+.github-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #232f3e;
+    color: #ffffff;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.github-btn:hover {
+    background-color: #ff9900;
+    color: #232f3e;
+    transform: translateY(-1px);
 }
 
 h2 {
@@ -57,7 +87,7 @@ footer {
     list-style-type: square;
     padding-left: 20px;
     margin: 0;
-    columns: 2; /* Splits the long language list into two elegant columns */
+    columns: 2;
     -webkit-columns: 2;
     -moz-columns: 2;
 }
