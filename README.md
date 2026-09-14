@@ -1,4 +1,4 @@
-# AWS Serverless Cloud Resume Challenge
+﻿# AWS Serverless Cloud Resume Challenge
 
 ![CI/CD Pipeline](https://github.com/Adonitologist/aws-cloud-resume-challenge/actions/workflows/deploy.yml/badge.svg)
 ![Terraform](https://img.shields.io/badge/IaC-Terraform_v1.5+-844FBA?logo=terraform)
@@ -22,20 +22,18 @@ flowchart TD
         STS -->|AssumeRole| IAM[IAM GitHub Role]
         IAM -->|Terraform Apply & S3 Sync| AWS[AWS Cloud Environment]
     end
+```
 
-Core Technical Highlights
+## Core Technical Highlights
 
-    Passwordless Security (OIDC): Zero persistent AWS Access Keys stored in GitHub Secrets. Deployment relies strictly on OpenID Connect federated identity (sts:AssumeRoleWithWebIdentity).
+* **Passwordless Security (OIDC):** Zero persistent AWS Access Keys stored in GitHub Secrets. Deployment relies strictly on OpenID Connect federated identity (sts:AssumeRoleWithWebIdentity).
+* **S3 Origin Access Control (OAC):** S3 bucket permissions locked to read-only access exclusively granted to CloudFront Service Principal via bucket policies.
+* **Atomic NoSQL Execution:** Visitor tracking leverages DynamoDB ADD update expressions to prevent race conditions during high-concurrency requests.
+* **Automated Quality & Security Gates:** Integrated GitHub Actions workflow running Python unit tests (moto mock framework), 	flint static analysis, and 	fsec security vulnerability inspection.
 
-    S3 Origin Access Control (OAC): S3 bucket permissions locked to read-only access exclusively granted to CloudFront Service Principal via bucket policies.
+## Repository Structure
 
-    Atomic NoSQL Execution: Visitor tracking leverages DynamoDB ADD update expressions to prevent race conditions during high-concurrency requests.
-
-    Automated Quality & Security Gates: Integrated GitHub Actions workflow running Python unit tests (moto mock framework), tflint static analysis, and tfsec security vulnerability inspection.
-
-Repository Structure
-Plaintext
-
+```text
 .
 ├── .github/workflows/
 │   └── deploy.yml            # CI/CD Multi-Stage Automation Workflow
@@ -50,33 +48,33 @@ Plaintext
 ├── main.tf                   # Main AWS Infrastructure Resources Definition
 ├── outputs.tf                # Infrastructure Output Values
 └── README.md                 # System Documentation
+```
 
-Infrastructure & Local Deployment
-Prerequisites
+## Infrastructure & Local Deployment
 
-    AWS CLI v2 configured with active session.
+### Prerequisites
+* AWS CLI v2 configured with active session.
+* Terraform >= v1.5.0 installed.
 
-    Terraform >= v1.5.0 installed.
+### Execution Commands
 
-Execution Commands
+1. Initialize remote S3 backend state:
+   ```bash
+   terraform init -reconfigure
+   ```
 
-    Initialize remote S3 backend state:
-    Bash
+2. Validate and format IaC files:
+   ```bash
+   terraform fmt -check
+   tflint
+   ```
 
-    terraform init -reconfigure
+3. Deploy AWS resources:
+   ```bash
+   terraform apply -auto-approve
+   ```
 
-    Validate and format IaC files:
-    Bash
-
-    terraform fmt -check
-    tflint
-
-    Deploy AWS resources:
-    Bash
-
-    terraform apply -auto-approve
-
-    Destroy environment (Zero-Cost Baseline):
-    Bash
-
-    terraform destroy -auto-approve
+4. Destroy environment (Zero-Cost Baseline):
+   ```bash
+   terraform destroy -auto-approve
+   ```
