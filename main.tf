@@ -240,10 +240,4 @@ resource "aws_iam_role_policy" "github_actions_policy" {
 }
 
 # Outputs de Infraestructura
-output "api_endpoint" {
-  value = "${aws_apigatewayv2_api.resume_api.api_endpoint}/counter"
-}
 
-output "cloudfront_domain" {
-  value = aws_cloudfront_distribution.resume_cdn.domain_name
-}
