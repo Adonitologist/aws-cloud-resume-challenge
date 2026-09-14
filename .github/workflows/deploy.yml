@@ -1,0 +1,73 @@
+name: "Serverless Resume CI/CD Pipeline"
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test-and-deploy:
+    name: "Test, Validate & Deploy"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Dependencies & Run Backend Tests
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt boto3
+          python -m unittest backend/test_lambda.py
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.7
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::154932391641:role/github-actions-cloud-resume-role
+          aws-region: us-east-1
+
+      - name: Terraform Format & Init
+        run: |
+          terraform fmt -check
+          terraform init
+
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: v0.50.0
+
+      - name: Run TFLint
+        run: |
+          tflint --init
+          tflint -f compact
+
+      - name: tfsec Security Scan
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          soft_fail: false
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      - name: Deploy Frontend to S3 & Invalidate Cache
+        run: |
+          S3_BUCKET=$(terraform output -raw s3_bucket_name 2>/dev/null || echo "juaneslava-cloud-resume-2026")
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query "DistributionList.Items[?Origins.Items[0].DomainName=='$S3_BUCKET.s3.us-east-1.amazonaws.com'].Id" --output text)
+          
+          aws s3 sync ./frontend s3://$S3_BUCKET --delete
+          if [ -n "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation --distribution-id $DISTRIBUTION_ID --paths "/*"
+          fi
