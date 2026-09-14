@@ -80,4 +80,3 @@ Execution Commands
     Bash
 
     terraform destroy -auto-approve
-
