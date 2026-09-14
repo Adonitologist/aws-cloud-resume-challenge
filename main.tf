@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.5.0"
   backend "s3" {
     bucket = "juaneslava-terraform-state-2026"
     key    = "cloud-resume/terraform.tfstate"
