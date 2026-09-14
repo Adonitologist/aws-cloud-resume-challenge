@@ -34,7 +34,6 @@ Core Technical Highlights
     Automated Quality & Security Gates: Integrated GitHub Actions workflow running Python unit tests (moto mock framework), tflint static analysis, and tfsec security vulnerability inspection.
 
 Repository Structure
-Plaintext
 
 .
 ├── .github/workflows/
@@ -60,24 +59,24 @@ Prerequisites
 
 Execution Commands
 
-    Initialize remote S3 backend state:
-    Bash
+Initialize remote S3 backend state:
+Bash
 
-    terraform init -reconfigure
+terraform init -reconfigure
 
-    Validate and format IaC files:
-    Bash
+Validate and format IaC files:
+Bash
 
-    terraform fmt -check
-    tflint
+terraform fmt -check
+tflint
 
-    Deploy AWS resources:
-    Bash
+Deploy AWS resources:
+Bash
 
-    terraform apply -auto-approve
+terraform apply -auto-approve
 
-    Destroy environment (Zero-Cost Baseline):
-    Bash
+Destroy environment (Zero-Cost Baseline):
+Bash
 
-    terraform destroy -auto-approve
+terraform destroy -auto-approve
 
