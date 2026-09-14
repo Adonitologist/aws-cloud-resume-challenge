@@ -2,7 +2,7 @@ window.addEventListener('DOMContentLoaded', () => {
     getVisitorCount();
 });
 
-const apiEndpoint = "https://jb6xr0cby2.execute-api.us-east-1.amazonaws.com/counter";
+const apiEndpoint = "https://kl217gst39.execute-api.us-east-1.amazonaws.com/counter";
 
 async function getVisitorCount() {
     try {
