@@ -1,59 +1,83 @@
-<<<<<<< HEAD
-# Cloud Resume Challenge
+# AWS Serverless Cloud Resume Challenge
 
-This repository contains the complete infrastructure-as-code and automation logic for my cloud-hosted resume. This project demonstrates proficiency in AWS serverless architecture, CI/CD automation, and software testing.
+![CI/CD Pipeline](https://github.com/Adonitologist/aws-cloud-resume-challenge/actions/workflows/deploy.yml/badge.svg)
+![Terraform](https://img.shields.io/badge/IaC-Terraform_v1.5+-844FBA?logo=terraform)
+![AWS](https://img.shields.io/badge/AWS-Serverless-232F3E?logo=amazon-aws)
+![Security](https://img.shields.io/badge/Security-OIDC_Passwordless-success)
 
-## Architecture
-* **Frontend:** Hosted on **AWS S3** and served globally via **Amazon CloudFront**.
-* **Backend:** Serverless API powered by **AWS Lambda** (Python 3.13) and **Amazon API Gateway**.
-* **Database:** **Amazon DynamoDB** stores the visitor count.
-* **IaC:** Entire stack deployed using **Terraform** with remote state management in S3.
-* **CI/CD:** Fully automated pipeline using **GitHub Actions** with OIDC-based secure AWS authentication.
+Production-ready serverless personal resume infrastructure hosted on AWS. Built with Infrastructure as Code (IaC) via Terraform, fully automated with GitHub Actions OIDC passwordless deployment, and protected with automated unit testing, TFLint analysis, and tfsec security scanners.
 
-## CI/CD Pipeline
-Every push to the `main` branch triggers an automated workflow:
-1. **Authentication:** Uses OpenID Connect (OIDC) to assume a secure AWS IAM role.
-2. **Testing:** Executes Python unit tests using `unittest` and `moto` to validate backend logic in a mocked environment.
-3. **Infrastructure:** Runs `terraform apply` to provision or update AWS resources.
-4. **Deployment:** Syncs frontend assets to S3 and invalidates the CloudFront cache.
+## System Architecture
 
-## Backend Automated Testing
-To ensure the visitor counter logic is robust, I implemented automated testing:
-* **Framework:** Python `unittest`.
-* **Mocking:** Used `moto` to simulate DynamoDB locally, ensuring tests run in the CI pipeline without needing live infrastructure access.
+```mermaid
+flowchart TD
+    Client([User Browser]) -->|HTTPS / TLS| CDN[Amazon CloudFront CDN]
+    CDN -->|Origin Access Control| S3[(Amazon S3 Bucket\nPrivate Web Hosting)]
+    Client -->|API Requests| API[Amazon API Gateway V2\nHTTP API Router]
+    API -->|Proxy Integration| Lambda[AWS Lambda Function\nPython 3.13 Runtime]
+    Lambda -->|Atomic Update| DynamoDB[(Amazon DynamoDB\nPay-Per-Request Table)]
 
-## Repository Structure
-* `/backend`: Contains the Lambda function logic (`lambda_function.py`) and unit tests (`test_lambda.py`).
-* `/frontend`: Contains the static website assets.
-* `main.tf`: Terraform configuration file for the entire infrastructure stack.
-* `.github/workflows/`: Contains the CI/CD pipeline definition (`frontend-deploy.yml`).
+    subgraph CI/CD Pipeline
+        GA[GitHub Actions] -->|Passwordless OIDC Auth| STS[AWS STS]
+        STS -->|AssumeRole| IAM[IAM GitHub Role]
+        IAM -->|Terraform Apply & S3 Sync| AWS[AWS Cloud Environment]
+    end
 
-## Technologies Used
-* **AWS:** S3, CloudFront, Lambda, API Gateway, DynamoDB, IAM, OIDC.
-* **Tools:** Terraform, Python, GitHub Actions, Moto.
-=======
-# AWS Cloud Resume Challenge
+Core Technical Highlights
 
-This repository contains the infrastructure and code for my Cloud Resume Challenge project. The project is designed to demonstrate proficiency in serverless architecture and Infrastructure as Code (IaC).
+    Passwordless Security (OIDC): Zero persistent AWS Access Keys stored in GitHub Secrets. Deployment relies strictly on OpenID Connect federated identity (sts:AssumeRoleWithWebIdentity).
 
-## Architecture
-- **Frontend:** Hosted on AWS S3 and distributed via Amazon CloudFront.
-- **Backend:** A serverless API using AWS Lambda and Amazon API Gateway.
-- **Database:** Visitor counter data stored in Amazon DynamoDB.
-- **Infrastructure:** Fully managed via Terraform.
+    S3 Origin Access Control (OAC): S3 bucket permissions locked to read-only access exclusively granted to CloudFront Service Principal via bucket policies.
 
-## Features
-- Scalable, serverless architecture.
-- Automated deployment processes.
-- Secure access via OAC (Origin Access Control).
+    Atomic NoSQL Execution: Visitor tracking leverages DynamoDB ADD update expressions to prevent race conditions during high-concurrency requests.
 
-## Prerequisites
-- AWS CLI configured with appropriate credentials.
-- Terraform installed.
+    Automated Quality & Security Gates: Integrated GitHub Actions workflow running Python unit tests (moto mock framework), tflint static analysis, and tfsec security vulnerability inspection.
 
-## Deployment
-1. Initialize Terraform:
-   `terraform init`
-2. Apply the configuration:
-   `terraform apply`
->>>>>>> 1ffb33753158caeb1afa760f83ba4f0f5cbbb9cf
+Repository Structure
+Plaintext
+
+.
+├── .github/workflows/
+│   └── deploy.yml            # CI/CD Multi-Stage Automation Workflow
+├── backend/
+│   ├── lambda_function.py    # Python Lambda Handler for Counter Logic
+│   ├── requirements.txt      # Backend Dependencies (boto3, moto)
+│   └── test_lambda.py        # Python Unit Tests
+├── frontend/
+│   ├── index.html            # Web Layout
+│   ├── main.js               # Dynamic API Gateway Fetch Logic
+│   └── style.css             # AWS UI-Themed Styling
+├── main.tf                   # Main AWS Infrastructure Resources Definition
+├── outputs.tf                # Infrastructure Output Values
+└── README.md                 # System Documentation
+
+Infrastructure & Local Deployment
+Prerequisites
+
+    AWS CLI v2 configured with active session.
+
+    Terraform >= v1.5.0 installed.
+
+Execution Commands
+
+    Initialize remote S3 backend state:
+    Bash
+
+    terraform init -reconfigure
+
+    Validate and format IaC files:
+    Bash
+
+    terraform fmt -check
+    tflint
+
+    Deploy AWS resources:
+    Bash
+
+    terraform apply -auto-approve
+
+    Destroy environment (Zero-Cost Baseline):
+    Bash
+
+    terraform destroy -auto-approve
+
